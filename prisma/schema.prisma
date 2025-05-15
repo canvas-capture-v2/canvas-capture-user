@@ -1,0 +1,42 @@
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://billyyork:password@localhost:5432/canvas_capture_user?schema=user"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "app/generated/prisma/client"
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String   @unique
+  password   String
+  created_on DateTime @default(now())
+  Courses    Course[]
+  tokens     String[]
+}
+
+model Course {
+  id                Int               @id
+  user              User              @relation(fields: [user_id], references: [id])
+  user_id           Int               @unique
+  name              String
+  course_code       String
+  assignment_groups AssignmentGroup[]
+}
+
+model AssignmentGroup {
+  id          Int          @id
+  course      Course       @relation(fields: [course_id], references: [id])
+  course_id   Int          @unique
+  name        String
+  assignments Assignment[]
+}
+
+model Assignment {
+  id                  Int             @id
+  assignment_group    AssignmentGroup @relation(fields: [assignment_group_id], references: [id])
+  assignment_group_id Int             @unique
+}

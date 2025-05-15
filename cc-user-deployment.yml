@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cc-user-deployment
+  labels:
+    app: cc-user
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cc-user
+  template:
+    metadata:
+      labels:
+        app: cc-user
+    spec:
+      containers:
+        - name: cc-user
+          image: yorkwmsoe/cc-user
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 4004
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cc-user-service
+spec:
+  ports:
+    - port: 4004
+      protocol: TCP
+      targetPort: 4004
+  selector:
+    app: cc-user
+  type: LoadBalancer

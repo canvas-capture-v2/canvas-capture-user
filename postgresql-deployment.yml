@@ -1,0 +1,53 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-postgresql
+  labels:
+    app: user-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-db
+  template:
+    metadata:
+      labels:
+        app: user-db
+    spec:
+      containers:
+        - name: user-postgresql
+          image: postgres
+          imagePullPolicy: Never
+          env:
+            - name: POSTGRES_USER
+              value: billyyork
+            - name: POSTGRES_DB
+              value: dev
+            - name: POSTGRES_PASSWORD
+              value: password
+          ports:
+            - containerPort: 5433
+              name: user-db-container
+          volumeMounts:
+            - name: user-postgres-persistent-storage
+              mountPath: /var/lib/postgres/user
+      volumes:
+        - name: user-postgres-persistent-storage
+          persistentVolumeClaim:
+            claimName: user-pv-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-postgresql
+  labels:
+    app: user-db
+spec:
+  ports:
+    - port: 5433
+      protocol: TCP
+      name: user-postgresql
+  selector:
+    app: user-db
+  type: LoadBalancer
